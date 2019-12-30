@@ -2,17 +2,17 @@ package com.bot.commands;
 
 import java.io.BufferedWriter;
 
-import com.bot.Message;
+import com.bot.util.BotCommonHelper;
 
 public class VoteCommand implements Command {
 	private String question;
 	private String[] options;
+
 	
-	
-	public void execute(String[] messageToken, BufferedWriter bw, Message message) {
+	public void execute(String[] messageToken, BufferedWriter bw) {
 		question = messageToken[1];
 		options = messageToken;
 		
-		message.sendMessage(bw, "PRIVMSG #" + "titan10x" + " :" + messageToken[0] + " initiated a vote!");
+		BotCommonHelper.sendMessage(bw, "PRIVMSG #" + "titan10x" + " :" + messageToken[0] + " initiated a vote!");
 	}
 }

@@ -2,8 +2,8 @@ package com.bot.commands;
 
 import java.io.BufferedWriter;
 
-import com.bot.Message;
+import com.bot.util.BotCommonHelper;
 
 public interface Command {
-	public void execute(String[] messageToken, BufferedWriter bw, Message message);
+	void execute(String[] messageToken, BufferedWriter bw);
 }
