@@ -1,18 +1,13 @@
 package com.bot.config;
 
-import java.util.Map;
-
+import com.bot.commands.Command;
 import com.google.common.collect.ImmutableMap;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
-import com.bot.commands.Command;
-
-import javax.annotation.Nonnull;
+import java.util.Map;
 
 @Component
 @PropertySource("classpath:config.properties")
@@ -21,21 +16,21 @@ public class BotProperties {
 
 	@Value("${conn.username}")
     private String username;
-	
+
 	@Value("${conn.host}")
     private String host;
-	
+
 	@Value("${conn.pass}")
     private String pass;
-	
+
 	@Value("${conn.channel}")
     private String channel;
-	
+
 	@Value("${conn.port}")
     private String port;
-	
+
 	private static Map<String, Command> commandList;
-	
+
 	public String getUsername() {
 		return username;
 	}
