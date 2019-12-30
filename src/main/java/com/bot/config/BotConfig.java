@@ -10,14 +10,19 @@ import org.springframework.context.annotation.Configuration;
 import com.bot.commands.Command;
 import com.bot.service.BotService;
 import com.bot.service.BotServiceImpl;
+import com.bot.ui.MainWindow;
 
 @Configuration
 @ComponentScan
 public class BotConfig {
 
 	@Bean
-	public BotService botService(BotProperties botProperties) {
-		return new BotServiceImpl(botProperties);
+	public BotService botService(BotProperties botProperties, MainWindow mainWindow) {
+		return new BotServiceImpl(botProperties, mainWindow);
+	}
+	
+	@Bean MainWindow mainWindow() {
+		return new MainWindow();
 	}
 	
 	@Bean

@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.lang.reflect.Constructor;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +21,13 @@ import com.bot.Message;
 import com.bot.commands.Command;
 import com.bot.commands.VoteCommand;
 import com.bot.config.BotProperties;
+import com.bot.ui.ConnectWindow;
+import com.bot.ui.MainWindow;
 
 public class BotServiceImpl implements BotService {
 	
 	private BotProperties botProperties;
+	private MainWindow mainWindow;
     private Socket socket;
     private BufferedWriter writer;
     private BufferedReader reader;
@@ -31,8 +35,9 @@ public class BotServiceImpl implements BotService {
 	private boolean isRunning;
 	
 	@Autowired
-	public BotServiceImpl(BotProperties botProperties) {
+	public BotServiceImpl(BotProperties botProperties, MainWindow mainWindow) {
 		this.botProperties = botProperties;
+		this.mainWindow = mainWindow;
 	}
 	
 	@Override
@@ -58,19 +63,31 @@ public class BotServiceImpl implements BotService {
 	
 	@Override
 	public void init() {
-    	try {
-    		socket = new Socket(botProperties.getHost(), Integer.parseInt(botProperties.getPort()));
-    		writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-    		reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-    		message = new Message(botProperties.getUsername(), botProperties.getPass(), botProperties.getCommandList());
-    		message.sendMessage(writer, "PASS " + botProperties.getPass());
-    		message.sendMessage(writer, "NICK " + botProperties.getUsername());
-    		message.sendMessage(writer, "USER " + botProperties.getUsername());
-    		message.sendMessage(writer, "JOIN #" + botProperties.getChannel());
-    		loop();
-    	} catch(IOException e) {
-    		e.getStackTrace();
-    	}
+    		ConnectWindow connectWindow = new ConnectWindow(mainWindow, this);
+    		connectWindow.createAndShowGUI();
+	}
+	
+	public void connect() {
+		try {
+			socket = new Socket(botProperties.getHost(), Integer.parseInt(botProperties.getPort()));
+			writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+			reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			message = new Message(botProperties.getUsername(), botProperties.getPass(), botProperties.getCommandList());
+			message.sendMessage(writer, "PASS " + botProperties.getPass());
+			message.sendMessage(writer, "NICK " + botProperties.getUsername());
+			message.sendMessage(writer, "USER " + botProperties.getUsername());
+			message.sendMessage(writer, "JOIN #" + botProperties.getChannel());
+		} catch (NumberFormatException | IOException e) {
+			e.printStackTrace();
+		}
+		
+		Thread t1 = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+		    	loop();
+		    }
+		});  
+		t1.start();
 	}
 	
 	public void loop() {
@@ -82,12 +99,13 @@ public class BotServiceImpl implements BotService {
 	    		   token = line.split(" ");
 	    		   if(token.length > 3 && token[3].substring(1).startsWith("!")) {
 	    			   token[0] = token[0].replaceAll(":(.*?)\\!|@(.*)", "");
-		    		   if(line.toLowerCase().contains(":!vote") && token.length > 3 && token[0] != "titan10x") {
-		    			   message.receiveMessage(writer, token[0], token[3].substring(1));
+		    		   if(token[3].toLowerCase().contains(":!vote") && token.length > 3 && token[0] != "titan10x") {
+		    			   message.receiveMessage(writer, token[0], token);
 		    		   } else {
 		    			   message.sendMessage(writer, "Usage: !vote <question> <choice1> <choice2> ... <choice8>");
 		    		   }
 	    		   }
+	    		   mainWindow.setChatArea(line);
 	    		   System.out.println(line);
 	    	   }
 	       } catch (IOException e) {

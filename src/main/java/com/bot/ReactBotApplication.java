@@ -8,6 +8,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.ComponentScan;
 
 import com.bot.service.BotService;
+import com.bot.ui.ConnectWindow;
 
 @EnableConfigurationProperties
 @SpringBootApplication
@@ -30,5 +31,4 @@ public class ReactBotApplication implements CommandLineRunner {
 		this.botService.loadCommands();
 		this.botService.init();
 	}
-
 }

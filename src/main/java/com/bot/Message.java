@@ -21,12 +21,11 @@ public class Message {
         this.commandList = commandList;
     }
     
-    public void receiveMessage(BufferedWriter bw, String userName, String message) {
-    	String[] messageToken = message.split(" ");
-    	String command = messageToken[0];
-    	if(command.startsWith("!")) {
-    		if(commandList.containsKey(command.substring(1))) {
-    			commandList.get(command.substring(1)).execute(messageToken, bw, this);
+    public void receiveMessage(BufferedWriter bw, String userName, String[] messageToken) {
+    	String command = messageToken[3];
+    	if(command.substring(1).startsWith("!")) {
+    		if(commandList.containsKey(command.substring(2))) {
+    			commandList.get(command.substring(2)).execute(messageToken, bw, this);
     		}
     	}
     }
